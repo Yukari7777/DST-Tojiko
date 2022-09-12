@@ -8,6 +8,11 @@
 	"Like \"this\"."
 ]]
 return {
+    SKILLS_COOLDOWN = { --대사가 여러개일경우 랜덤으로 출력
+        "쿨타임 대사1",
+        "쿨타임 대사2",
+        "쿨타임 대사3",
+    },
 	ACTIONFAIL =
 	{
         REPAIR =

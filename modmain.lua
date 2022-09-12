@@ -1,6 +1,7 @@
 PrefabFiles = {
 	"tojiko",
 	"tojiko_none",
+    "tojiko_classified", -- 클라이언트와 관련된 처리를 하는 오브젝트
 }
 
 Assets = {
@@ -68,3 +69,4 @@ local skin_modes = {
 
 -- Add mod character to mod character list. Also specify a gender. Possible genders are MALE, FEMALE, ROBOT, NEUTRAL, and PLURAL.
 AddModCharacter("tojiko", "FEMALE", skin_modes)
+modimport "scripts/skills_tojiko.lua" -- skills_util.lua 로드

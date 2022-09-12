@@ -55,20 +55,63 @@ end
 
 --end
 
+local function OnSetOwner(inst)
+    if TheWorld.ismastersim then
+        inst.tojiko_classified.Network:SetClassifiedTarget(inst)
+    end
+end
+
+local function AttachClassified(inst, classified)
+    inst.tojiko_classified = classified
+    inst.ondetachclassified = function() inst:DetachClassified() end
+    inst:ListenForEvent("onremove", inst.ondetachclassified, classified)
+end
+
+local function DetachClassified(inst)
+    inst.tojiko_classified = nil
+    inst.ondetachclassified = nil
+end
+
+local function OverrideOnRemoveEntity(inst)
+    inst.OnRemoveTojiko = inst.OnRemoveEntity
+    function inst.OnRemoveEntity(inst)
+        if inst.jointask ~= nil then
+            inst.jointask:Cancel()
+        end
+
+        if inst.tojiko_classified ~= nil then
+            if TheWorld.ismastersim then
+                inst.tojiko_classified:Remove()
+                inst.tojiko_classified = nil
+            else
+                inst:RemoveEventCallback("onremove", inst.ondetachclassified, inst.tojiko_classified)
+                inst:DetachClassified()
+            end
+        end
+        return inst:OnRemoveTojiko()
+    end
+end
+
 -- This initializes for both the server and client. Tags can be added here.
 local common_postinit = function(inst) 
 	-- Minimap icon
-	
-	 
-
-	
+	inst:AddTag("tojiko")
 	inst.MiniMapEntity:SetIcon( "tojiko.tex" )
 	
-	
+	-- Yukari: 키 입력한 것을 서버에 전송하기 위해 Classified를 만든뒤, 클라이언트의 초기화 단계에서 부착시킨다.
+	inst:ListenForEvent("setowner", OnSetOwner)
+    OverrideOnRemoveEntity(inst)
+    inst.AttachTojikoClassified = AttachClassified
+    inst.DetachTojikoClassified = DetachClassified
 end
 
 -- This initializes for the server only. Components are added here.
 local master_postinit = function(inst)
+	inst.tojiko_classified = SpawnPrefab("tojiko_classified")
+    inst:AddChild(inst.tojiko_classified)
+
+
+	inst:AddComponent("tojikoskill") --스킬
 	-- Set starting inventory
     inst.starting_inventory = start_inv[TheNet:GetServerGameMode()] or start_inv.default
 	
