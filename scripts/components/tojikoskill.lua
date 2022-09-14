@@ -67,7 +67,11 @@ function TojikoSkill:ThunderStrike()
         SpawnPrefab("lightning").Transform:SetPosition(x-3, y, z-3) -- 좌표 조금씩 움직여서 커서지점에 맞출 필요가 있어보임
         local targets = TheSim:FindEntities(x, y, z, THUNDER_RADIUS, nil, {"INLIMBO", "ignorethunder"})
         for _, v in pairs(targets) do
-            if v.components.playerlightningtarget ~= nil and (v.components.health ~= nil and not v.components.health:IsInvincible()) then 
+            if v.components.playerlightningtarget ~= nil and (v.components.health ~= nil and not v.components.health:IsInvincible()) then
+                if v.components.inventory.isexternallyinsulated == nil then  -- 구 인벤 확장모드 수정
+                    v.components.inventory.isexternallyinsulated = {}
+                    v.components.inventory.isexternallyinsulated.Get = function(self) return false end
+                end
                 v.components.playerlightningtarget:DoStrike()
             elseif v.components.health ~= nil and not v.components.health:IsInvincible() then -- playerlightningtarget.lua
                 local mult = v.components.moisture ~= nil and TUNING.ELECTRIC_WET_DAMAGE_MULT * v.components.moisture:GetMoisturePercent() or 1 -- 젖을수록 데미지 증가
